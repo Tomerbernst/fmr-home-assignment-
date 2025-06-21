@@ -3,11 +3,12 @@ import {UserOrdersComponent} from './components/user-orders/user-orders.componen
 import {loadUsers} from './store/users/users.actions';
 import {Store} from '@ngrx/store';
 import {loadOrders} from './store/orders/orders.actions';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [UserOrdersComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

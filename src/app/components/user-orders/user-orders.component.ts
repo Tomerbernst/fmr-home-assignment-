@@ -65,7 +65,7 @@ export class UserOrdersComponent implements OnInit {
     });
 
     public updateUserForm: FormGroup = this.fb.group({
-        id: [{value: null, disabled: true}],
+        id: [null],
         name: [''],
         order: [null]
     });
@@ -126,22 +126,27 @@ export class UserOrdersComponent implements OnInit {
 
 
     public onUpdateUser(): void {
-        if (this.updateUserForm.invalid) return;
-
         const {id, name, order} = this.updateUserForm.getRawValue();
 
-        this.store.select(selectLastOrderId).pipe(take(1)).subscribe(lastOrderId => {
-            const newOrderId = lastOrderId + 1;
+        if (!name && !order) return;
 
+        if (name) {
             this.store.dispatch(upsertUser({user: {id, name}}));
-            this.store.dispatch({
-                type: '[Order] Add Order',
-                order: {id: newOrderId, userId: id, total: order}
-            });
+        }
 
-            this.updateUserForm.reset();
-            this.store.dispatch(selectUser({userId: 0}));
-        });
+        if (order) {
+            this.store.select(selectLastOrderId).pipe(take(1)).subscribe(lastOrderId => {
+                const newOrderId = lastOrderId + 1;
+
+                this.store.dispatch({
+                    type: '[Order] Add Order',
+                    order: {id: newOrderId, userId: id, total: order}
+                });
+            });
+        }
+
+        this.updateUserForm.reset();
+        this.store.dispatch(selectUser({userId: 0}));
     }
 
 
