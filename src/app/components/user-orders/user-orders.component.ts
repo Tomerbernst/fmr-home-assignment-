@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import {
     selectSelectedUserId,
     selectSelectedUserName,
-    selectSelectedUserTotal,
     selectUserEntities
 } from '../../store/users/users.selectors';
 import { Store } from '@ngrx/store';
@@ -27,6 +26,7 @@ import { MatSelect } from "@angular/material/select";
 import { MatOption } from "@angular/material/core";
 import { deleteOrdersByUserId } from "../../store/orders/orders.actions";
 import { MatTab, MatTabGroup } from "@angular/material/tabs";
+import {selectSelectedUserTotal} from "../../store/orders/orders.selectors";
 
 @Component({
     selector: 'app-user-orders',
