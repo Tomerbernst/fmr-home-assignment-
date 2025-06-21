@@ -34,7 +34,7 @@
                         Update User
                     </button>
 
-                    <button mat-raised-button  type="button" (click)="onRemoveUser()"
+                    <button mat-raised-button type="button" (click)="onRemoveUser()"
                             [disabled]="updateUserForm.get('id')?.value == null">
                         Remove Selected User
                     </button>
@@ -65,7 +65,7 @@
                 </mat-form-field>
 
                 <div class="button-group">
-                    <button mat-raised-button color="primary" type="submit" [disabled]="addUserForm.invalid">
+                    <button mat-flat-button type="submit" [disabled]="addUserForm.invalid">
                         Add User
                     </button>
                 </div>
