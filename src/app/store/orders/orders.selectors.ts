@@ -12,11 +12,12 @@ export const selectOrderEntities = createSelector(
 export const selectSelectedUserOrders = createSelector(
   selectOrderEntities,
   selectSelectedUserId,
-  (orders, userId) =>
+  (entities, userId) =>
     userId !== null
-      ? Object.values(orders as Record<number, Order>).filter(o => o.userId === userId)
+      ? Object.values(entities).filter(order => order.userId === userId)
       : []
 );
+
 
 export const selectSelectedUserTotal = createSelector(
   selectSelectedUserOrders,

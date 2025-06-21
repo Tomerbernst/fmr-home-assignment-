@@ -79,7 +79,7 @@ export class UserOrdersComponent implements OnInit {
     public selectedUserId$ = this.store.select(selectSelectedUserId);
     public userName$ = this.store.select(selectSelectedUserName);
     public userTotal$ = this.store.select(selectSelectedUserTotal);
-    public userEntities: Record<number, User> = {};
+    public userEntities: { [id: number]: User } = {};
 
     public ngOnInit(): void {
         this.store.select(selectUserEntities).pipe(take(1)).subscribe(entities => {

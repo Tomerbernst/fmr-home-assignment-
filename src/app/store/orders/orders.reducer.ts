@@ -1,9 +1,11 @@
-import {createReducer, on} from '@ngrx/store';
+import { createReducer, on } from '@ngrx/store';
 import * as OrdersActions from './orders.actions';
-import {Order} from '../../app.state';
+import { Order } from '../../app.state';
 
 export interface OrdersState {
-  entities: Record<number, Order>;
+  entities: {
+    [id: number]: Order;
+  };
 }
 
 const initialState: OrdersState = {
@@ -13,15 +15,15 @@ const initialState: OrdersState = {
 export const ordersReducer = createReducer(
   initialState,
 
-  on(OrdersActions.loadOrdersSuccess, (state, {orders}) => ({
+  on(OrdersActions.loadOrdersSuccess, (state, { orders }) => ({
     ...state,
     entities: orders.reduce(
-      (acc, order) => ({...acc, [order.id]: order}),
-      {} as Record<number, Order>
+      (acc, order) => ({ ...acc, [order.id]: order }),
+      {} as { [id: number]: Order }
     )
   })),
 
-  on(OrdersActions.addOrder, (state, {order}) => ({
+  on(OrdersActions.addOrder, (state, { order }) => ({
     ...state,
     entities: {
       ...state.entities,
@@ -29,8 +31,8 @@ export const ordersReducer = createReducer(
     }
   })),
 
-  on(OrdersActions.deleteOrdersByUserId, (state, {userId}) => {
-    const filtered: Record<number, Order> = {};
+  on(OrdersActions.deleteOrdersByUserId, (state, { userId }) => {
+    const filtered: { [id: number]: Order } = {};
 
     for (const [id, order] of Object.entries(state.entities)) {
       if (order.userId !== userId) {

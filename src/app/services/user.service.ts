@@ -5,7 +5,7 @@ import {User} from '../app.state';
 
 @Injectable({providedIn: 'root'})
 export class UserService {
-  getUsers(): Observable<User[]> {
+  public getUsers(): Observable<User[]> {
     return of(mockUsers);
   }
 }
