@@ -29,11 +29,13 @@
                 </mat-form-field>
 
                 <div class="button-group">
-                    <button mat-raised-button color="primary" type="submit" [disabled]="updateUserForm.get('id')?.value == null">
+                    <button mat-raised-button color="primary" type="submit"
+                            [disabled]="updateUserForm.get('id')?.value == null">
                         Update User
                     </button>
 
-                    <button mat-stroked-button color="warn" type="button" (click)="onRemoveUser()">
+                    <button mat-stroked-button color="warn" type="button" (click)="onRemoveUser()"
+                            [disabled]="updateUserForm.get('id')?.value == null">
                         Remove Selected User
                     </button>
                 </div>
