@@ -25,7 +25,7 @@ import {MatButton} from "@angular/material/button";
 import {MatError, MatFormField, MatInput, MatLabel} from "@angular/material/input";
 import {MatSelect} from "@angular/material/select";
 import {MatOption} from "@angular/material/core";
-import {deleteOrdersByUserId} from "../../store/orders/orders.actions";
+import {addOrder, deleteOrdersByUserId} from "../../store/orders/orders.actions";
 import {MatTab, MatTabGroup} from "@angular/material/tabs";
 import {selectLastOrderId, selectSelectedUserTotal} from "../../store/orders/orders.selectors";
 
@@ -114,10 +114,8 @@ export class UserOrdersComponent implements OnInit {
                 const newOrderId = lastOrderId + 1;
 
                 this.store.dispatch(upsertUser({user: {id: newUserId, name}}));
-                this.store.dispatch({
-                    type: '[Order] Add Order',
-                    order: {id: newOrderId, userId: newUserId, total: order}
-                });
+                this.store.dispatch(addOrder({ order: { id: newOrderId, userId: newUserId, total: order } }));
+
 
                 this.addUserForm.reset();
             });
@@ -137,11 +135,7 @@ export class UserOrdersComponent implements OnInit {
         if (order) {
             this.store.select(selectLastOrderId).pipe(take(1)).subscribe(lastOrderId => {
                 const newOrderId = lastOrderId + 1;
-
-                this.store.dispatch({
-                    type: '[Order] Add Order',
-                    order: {id: newOrderId, userId: id, total: order}
-                });
+                this.store.dispatch(addOrder({ order: { id: newOrderId, userId: id, total: order } }));
             });
         }
 
