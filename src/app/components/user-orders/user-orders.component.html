@@ -1,0 +1,74 @@
+<mat-tab-group [(selectedIndex)]="selectedTabIndex">
+    <mat-tab label="Update User">
+        <mat-card class="user-card">
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Select User</mat-label>
+                <mat-select (selectionChange)="onSelectUser($event.value)" [value]="selectedUserId$ | async">
+                    <mat-option [disabled]="true" [value]="null">Please choose a user</mat-option>
+                    @for (user of usersArray$ | async; track user.id) {
+                        <mat-option [value]="user.id">{{ user.name }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <app-user-name [name]="userName$ | async" />
+            <app-user-total [total]="userTotal$ | async" />
+        </mat-card>
+
+        <mat-card class="form-card">
+            <form [formGroup]="updateUserForm" (ngSubmit)="onUpdateUser()">
+                <h3>Update Selected User</h3>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>User Name</mat-label>
+                    <input matInput formControlName="name" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Order Total</mat-label>
+                    <input matInput type="number" formControlName="order" />
+                </mat-form-field>
+
+                <div class="button-group">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="updateUserForm.invalid">
+                        Update User
+                    </button>
+
+                    <button mat-stroked-button color="warn" type="button" (click)="onRemoveUser()">
+                        Remove Selected User
+                    </button>
+                </div>
+            </form>
+        </mat-card>
+    </mat-tab>
+
+    <mat-tab label="Add User">
+        <mat-card class="form-card">
+            <form [formGroup]="addUserForm" (ngSubmit)="onAddUser()">
+                <h3>Add New User</h3>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>User Name</mat-label>
+                    <input matInput formControlName="name" required />
+                    @if (addUserForm.get('name')?.touched && addUserForm.get('name')?.hasError('required')) {
+                        <mat-error>User Name is required.</mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Order</mat-label>
+                    <input matInput type="number" formControlName="order" required />
+                    @if (addUserForm.get('order')?.touched && addUserForm.get('order')?.hasError('required')) {
+                        <mat-error>Order is required.</mat-error>
+                    }
+                </mat-form-field>
+
+                <div class="button-group">
+                    <button mat-raised-button color="primary" type="submit" [disabled]="addUserForm.invalid">
+                        Add User
+                    </button>
+                </div>
+            </form>
+        </mat-card>
+    </mat-tab>
+</mat-tab-group>
