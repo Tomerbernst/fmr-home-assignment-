@@ -1,42 +1,39 @@
-import { createReducer, on } from '@ngrx/store';
+import {createReducer, on} from '@ngrx/store';
+import {createEntityAdapter, EntityAdapter, EntityState} from '@ngrx/entity';
 import * as UsersActions from './users.actions';
-import { User } from '../../app.state';
+import {User} from './users.models';
 
-export interface UsersState {
-  entities: { [id: number]: User };
+export interface UsersState extends EntityState<User> {
   selectedUserId: number | null;
 }
 
-const initialState: UsersState = {
-  entities: {},
+export const userAdapter: EntityAdapter<User> = createEntityAdapter<User>();
+
+export const initialState: UsersState = userAdapter.getInitialState({
   selectedUserId: null
-};
+});
 
 export const usersReducer = createReducer(
   initialState,
 
-  on(UsersActions.loadUsersSuccess, (state, { users }) => ({
-    ...state,
-    entities: users.reduce((acc, user) => ({ ...acc, [user.id]: user }), {})
-  })),
+  on(UsersActions.loadUsersSuccess, (state, {users}) =>
+    userAdapter.setAll(users, state)
+  ),
 
-  on(UsersActions.selectUser, (state, { userId }) => ({
-    ...state,
-    selectedUserId: userId
-  })),
+  on(UsersActions.upsertUser, (state, {user}) =>
+    userAdapter.upsertOne(user, state)
+  ),
 
-  on(UsersActions.upsertUser, (state, { user }) => ({
-    ...state,
-    entities: { ...state.entities, [user.id]: user }
-  })),
-
-  on(UsersActions.deleteUser, (state, { userId }) => {
-    const newEntities = { ...state.entities };
-    delete newEntities[userId];
+  on(UsersActions.deleteUser, (state, {userId}) => {
+    const newState = userAdapter.removeOne(userId, state);
     return {
-      ...state,
-      entities: newEntities,
+      ...newState,
       selectedUserId: state.selectedUserId === userId ? null : state.selectedUserId
     };
-  })
+  }),
+
+  on(UsersActions.selectUser, (state, {userId}) => ({
+    ...state,
+    selectedUserId: userId
+  }))
 );

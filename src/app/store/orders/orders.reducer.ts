@@ -1,48 +1,30 @@
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
 import * as OrdersActions from './orders.actions';
-import { Order } from '../../app.state';
+import { Order } from './orders.models';
 
-export interface OrdersState {
-  entities: {
-    [id: number]: Order;
-  };
-}
+export interface OrdersState extends EntityState<Order> {}
 
-const initialState: OrdersState = {
-  entities: {}
-};
+export const orderAdapter: EntityAdapter<Order> = createEntityAdapter<Order>();
+
+export const initialState: OrdersState = orderAdapter.getInitialState();
 
 export const ordersReducer = createReducer(
   initialState,
 
-  on(OrdersActions.loadOrdersSuccess, (state, { orders }) => ({
-    ...state,
-    entities: orders.reduce(
-      (acc, order) => ({ ...acc, [order.id]: order }),
-      {} as { [id: number]: Order }
-    )
-  })),
+  on(OrdersActions.loadOrdersSuccess, (state, { orders }) =>
+    orderAdapter.setAll(orders, state)
+  ),
 
-  on(OrdersActions.addOrder, (state, { order }) => ({
-    ...state,
-    entities: {
-      ...state.entities,
-      [order.id]: order
-    }
-  })),
+  on(OrdersActions.addOrder, (state, { order }) =>
+    orderAdapter.upsertOne(order, state)
+  ),
 
   on(OrdersActions.deleteOrdersByUserId, (state, { userId }) => {
-    const filtered: { [id: number]: Order } = {};
+    const ordersToKeep = Object.values(state.entities).filter(
+      (order): order is Order => !!order && order.userId !== userId
+    );
 
-    for (const [id, order] of Object.entries(state.entities)) {
-      if (order.userId !== userId) {
-        filtered[+id] = order;
-      }
-    }
-
-    return {
-      ...state,
-      entities: filtered
-    };
+    return orderAdapter.setAll(ordersToKeep, state);
   })
 );

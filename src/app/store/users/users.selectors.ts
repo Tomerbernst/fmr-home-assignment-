@@ -1,23 +1,26 @@
 import {createSelector} from '@ngrx/store';
 import {AppState} from '../../app.state';
+import {UsersState, userAdapter} from './users.reducer';
 
-const selectUsersState = (state: AppState) => state.users;
+const selectUsersState = (state: AppState): UsersState => state.users;
 
-export const selectUserEntities = createSelector(
-  selectUsersState,
-  users => users.entities
-);
+const {
+  selectAll: selectAllUsers,
+  selectEntities: selectUserEntities,
+  selectIds: selectUserIds,
+} = userAdapter.getSelectors(selectUsersState);
+
+export {selectAllUsers, selectUserEntities, selectUserIds};
 
 export const selectSelectedUserId = createSelector(
   selectUsersState,
-  users => users.selectedUserId
+  state => state.selectedUserId
 );
 
 export const selectSelectedUser = createSelector(
   selectUserEntities,
   selectSelectedUserId,
-  (entities, selectedId) =>
-    selectedId !== null ? entities[selectedId] : null
+  (entities, selectedId) => (selectedId != null ? entities[selectedId] ?? null : null)
 );
 
 export const selectSelectedUserName = createSelector(
@@ -26,10 +29,6 @@ export const selectSelectedUserName = createSelector(
 );
 
 export const selectLastUserId = createSelector(
-  selectUserEntities,
-  entities => {
-    const ids = Object.keys(entities).map(Number);
-    return ids.length ? Math.max(...ids) : 0;
-  }
+  selectUserIds,
+  ids => ids.length ? Math.max(...ids.map(Number)) : 0
 );
-

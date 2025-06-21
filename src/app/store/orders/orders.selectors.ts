@@ -1,34 +1,29 @@
 import {createSelector} from '@ngrx/store';
-import {AppState, Order} from '../../app.state';
+import {AppState} from '../../app.state';
 import {selectSelectedUserId} from '../users/users.selectors';
+import {orderAdapter} from './orders.reducer';
+import {OrdersState} from './orders.reducer';
 
-const selectOrdersState = (state: AppState) => state.orders;
+export const selectOrdersState = (state: AppState): OrdersState => state.orders;
 
-export const selectOrderEntities = createSelector(
-  selectOrdersState,
-  orders => orders.entities
-);
+const {
+  selectAll: selectAllOrders,
+} = orderAdapter.getSelectors(selectOrdersState);
+
 
 export const selectSelectedUserOrders = createSelector(
-  selectOrderEntities,
+  selectAllOrders,
   selectSelectedUserId,
-  (entities, userId) =>
-    userId !== null
-      ? Object.values(entities).filter(order => order.userId === userId)
-      : []
+  (orders, userId) =>
+    userId !== null ? orders.filter(order => order.userId === userId) : []
 );
-
 
 export const selectSelectedUserTotal = createSelector(
   selectSelectedUserOrders,
-  orders =>
-    orders.reduce((sum: number, order: Order) => sum + order.total, 0)
+  (orders) => orders.reduce((sum, order) => sum + order.total, 0)
 );
 
 export const selectLastOrderId = createSelector(
-  selectOrderEntities,
-  entities => {
-    const ids = Object.keys(entities).map(Number);
-    return ids.length ? Math.max(...ids) : 0;
-  }
+  selectAllOrders,
+  (orders) => orders.length ? Math.max(...orders.map(order => order.id)) : 0
 );

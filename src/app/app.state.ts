@@ -1,20 +1,8 @@
+import {UsersState} from './store/users/users.reducer';
+import {OrdersState} from './store/orders/orders.reducer';
+
 export interface AppState {
-  users: {
-    entities: { [id: number]: User };
-    selectedUserId: number | null;
-  };
-  orders: {
-    entities: { [id: number]: Order };
-  };
+  users: UsersState;
+  orders: OrdersState;
 }
 
-export interface User {
-  id: number;
-  name: string;
-}
-
-export interface Order {
-  id: number;
-  userId: number;
-  total: number;
-}

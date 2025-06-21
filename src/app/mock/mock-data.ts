@@ -1,4 +1,5 @@
-import {Order, User} from '../app.state';
+import {User} from '../store/users/users.models';
+import {Order} from '../store/orders/orders.models';
 
 export const mockUsers: User[] = [
   { id: 1, name: 'Alice' },
