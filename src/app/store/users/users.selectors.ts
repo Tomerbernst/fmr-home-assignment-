@@ -25,3 +25,11 @@ export const selectSelectedUserName = createSelector(
   user => user?.name ?? null
 );
 
+export const selectLastUserId = createSelector(
+  selectUserEntities,
+  entities => {
+    const ids = Object.keys(entities).map(Number);
+    return ids.length ? Math.max(...ids) : 0;
+  }
+);
+

@@ -7,9 +7,9 @@ export const mockUsers: User[] = [
 ];
 
 export const mockOrders: Order[] = [
-  { id: 101, userId: 1, total: 250 },
-  { id: 102, userId: 1, total: 150 },
-  { id: 103, userId: 2, total: 300 },
-  { id: 104, userId: 3, total: 100 },
-  { id: 105, userId: 3, total: 200 }
+  { id: 1, userId: 1, total: 250 },
+  { id: 2, userId: 1, total: 150 },
+  { id: 3, userId: 2, total: 300 },
+  { id: 4, userId: 3, total: 100 },
+  { id: 5, userId: 3, total: 200 }
 ];

@@ -1,17 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {
+    selectLastUserId,
     selectSelectedUserId,
     selectSelectedUserName,
     selectUserEntities
 } from '../../store/users/users.selectors';
-import { Store } from '@ngrx/store';
-import { deleteUser, selectUser, upsertUser } from '../../store/users/users.actions';
-import { AsyncPipe, CommonModule } from '@angular/common';
-import { map, take } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { User } from '../../app.state';
-import { UserNameComponent } from '../user-name/user-name.component';
-import { UserTotalComponent } from '../user-total/user-total.component';
+import {Store} from '@ngrx/store';
+import {deleteUser, selectUser, upsertUser} from '../../store/users/users.actions';
+import {AsyncPipe, CommonModule} from '@angular/common';
+import {map, take} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {User} from '../../app.state';
+import {UserNameComponent} from '../user-name/user-name.component';
+import {UserTotalComponent} from '../user-total/user-total.component';
 import {
     FormBuilder,
     FormGroup,
@@ -19,14 +20,14 @@ import {
     ReactiveFormsModule,
     Validators
 } from '@angular/forms';
-import { MatCard } from "@angular/material/card";
-import { MatButton } from "@angular/material/button";
-import { MatError, MatFormField, MatInput, MatLabel } from "@angular/material/input";
-import { MatSelect } from "@angular/material/select";
-import { MatOption } from "@angular/material/core";
-import { deleteOrdersByUserId } from "../../store/orders/orders.actions";
-import { MatTab, MatTabGroup } from "@angular/material/tabs";
-import {selectSelectedUserTotal} from "../../store/orders/orders.selectors";
+import {MatCard} from "@angular/material/card";
+import {MatButton} from "@angular/material/button";
+import {MatError, MatFormField, MatInput, MatLabel} from "@angular/material/input";
+import {MatSelect} from "@angular/material/select";
+import {MatOption} from "@angular/material/core";
+import {deleteOrdersByUserId} from "../../store/orders/orders.actions";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {selectLastOrderId, selectSelectedUserTotal} from "../../store/orders/orders.selectors";
 
 @Component({
     selector: 'app-user-orders',
@@ -64,7 +65,7 @@ export class UserOrdersComponent implements OnInit {
     });
 
     public updateUserForm: FormGroup = this.fb.group({
-        id: [{ value: null, disabled: true }],
+        id: [{value: null, disabled: true}],
         name: [''],
         order: [null]
     });
@@ -98,40 +99,57 @@ export class UserOrdersComponent implements OnInit {
                 });
             }
         });
-        this.store.dispatch(selectUser({ userId }));
+        this.store.dispatch(selectUser({userId}));
     }
 
     public onAddUser(): void {
         if (this.addUserForm.invalid) return;
 
-        const { name, order } = this.addUserForm.value;
-        const userId = Math.floor(Math.random() * 10000);
-        const orderId = Math.floor(Math.random() * 100000);
+        const {name, order} = this.addUserForm.value;
 
-        this.store.dispatch(upsertUser({ user: { id: userId, name } }));
-        this.store.dispatch({ type: '[Order] Add Order', order: { id: orderId, userId, total: order } });
+        this.store.select(selectLastUserId).pipe(take(1)).subscribe(lastUserId => {
+            const newUserId = lastUserId + 1;
 
-        this.addUserForm.reset();
+            this.store.select(selectLastOrderId).pipe(take(1)).subscribe(lastOrderId => {
+                const newOrderId = lastOrderId + 1;
+
+                this.store.dispatch(upsertUser({user: {id: newUserId, name}}));
+                this.store.dispatch({
+                    type: '[Order] Add Order',
+                    order: {id: newOrderId, userId: newUserId, total: order}
+                });
+
+                this.addUserForm.reset();
+            });
+        });
     }
+
 
     public onUpdateUser(): void {
         if (this.updateUserForm.invalid) return;
 
-        const { id, name, order } = this.updateUserForm.getRawValue();
-        const orderId = Math.floor(Math.random() * 100000);
+        const {id, name, order} = this.updateUserForm.getRawValue();
 
-        this.store.dispatch(upsertUser({ user: { id, name } }));
-        this.store.dispatch({ type: '[Order] Add Order', order: { id: orderId, userId: id, total: order } });
+        this.store.select(selectLastOrderId).pipe(take(1)).subscribe(lastOrderId => {
+            const newOrderId = lastOrderId + 1;
 
-        this.updateUserForm.reset();
-        this.store.dispatch(selectUser({ userId: 0 }));
+            this.store.dispatch(upsertUser({user: {id, name}}));
+            this.store.dispatch({
+                type: '[Order] Add Order',
+                order: {id: newOrderId, userId: id, total: order}
+            });
+
+            this.updateUserForm.reset();
+            this.store.dispatch(selectUser({userId: 0}));
+        });
     }
+
 
     public onRemoveUser(): void {
         this.store.select(selectSelectedUserId).pipe(take(1)).subscribe(userId => {
             if (userId != null) {
-                this.store.dispatch(deleteUser({ userId }));
-                this.store.dispatch(deleteOrdersByUserId({ userId }));
+                this.store.dispatch(deleteUser({userId}));
+                this.store.dispatch(deleteOrdersByUserId({userId}));
             }
         });
         this.updateUserForm.reset();

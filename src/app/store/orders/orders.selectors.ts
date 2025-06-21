@@ -24,3 +24,11 @@ export const selectSelectedUserTotal = createSelector(
   orders =>
     orders.reduce((sum: number, order: Order) => sum + order.total, 0)
 );
+
+export const selectLastOrderId = createSelector(
+  selectOrderEntities,
+  entities => {
+    const ids = Object.keys(entities).map(Number);
+    return ids.length ? Math.max(...ids) : 0;
+  }
+);

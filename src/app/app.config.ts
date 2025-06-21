@@ -7,6 +7,7 @@ import { ordersReducer } from './store/orders/orders.reducer';
 import {provideEffects} from '@ngrx/effects';
 import {UsersEffects} from './store/users/users.effects';
 import {OrderEffects} from './store/orders/orders.effects';
+import {provideStoreDevtools} from '@ngrx/store-devtools';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
       users: usersReducer,
       orders: ordersReducer
     }),
-    provideEffects(UsersEffects, OrderEffects)
+    provideEffects(UsersEffects, OrderEffects),
+    provideStoreDevtools()
   ]
 };
